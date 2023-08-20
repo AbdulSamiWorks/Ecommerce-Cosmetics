@@ -17,7 +17,6 @@ exports.createUser = async (req, res) => {
         const doc = await user.save();
 
         req.login(sanitizeUser(doc), (err) => {
-          // this also calls serializer and adds to session
           if (err) {
             res.status(400).json(err);
           } else {
@@ -77,13 +76,11 @@ exports.resetPasswordRequest = async (req, res) => {
     user.resetPasswordToken = token;
     await user.save();
 
-    // Also set token in email
     const resetPageLink =
       'https://cosmeticss.vercel.app/reset-password?token=' + token + '&email=' + email;
     const subject = 'reset password for e-commerce';
     const html = `<p>Click <a href='${resetPageLink}'>here</a> to Reset Password</p>`;
 
-    // lets send email and a token in the mail body so we can verify that user has clicked right link
 
     if (email) {
       const response = await sendMail({ to: email, subject, html });

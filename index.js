@@ -44,7 +44,6 @@ server.post(
       return;
     }
 
-    // Handle the event
     switch (event.type) {
       case 'payment_intent.succeeded':
         const paymentIntentSucceeded = event.data.object;
@@ -56,12 +55,10 @@ server.post(
         await order.save();
 
         break;
-      // ... handle other event types
       default:
         console.log(`Unhandled event type ${event.type}`);
     }
 
-    // Return a 200 response to acknowledge receipt of the event
     response.send();
   }
 );
@@ -80,8 +77,8 @@ server.use(cookieParser());
 server.use(
   session({
     secret: process.env.SESSION_KEY,
-    resave: false, // don't save session if unmodified
-    saveUninitialized: false, // don't create session until something stored
+    resave: false,
+    saveUninitialized: false, 
   })
 );
 server.use(passport.authenticate('session'));
@@ -90,10 +87,9 @@ server.use(
     exposedHeaders: ['X-Total-Count'],
   })
 );
-server.use(express.json()); // to parse req.body
+server.use(express.json()); 
 
 server.use('/products', isAuth(), productsRouter.router);
-// we can also use JWT token for client-only auth
 server.use('/categories', isAuth(), categoriesRouter.router);
 server.use('/brands', isAuth(), brandsRouter.router);
 server.use('/users', isAuth(), usersRouter.router);
@@ -101,12 +97,10 @@ server.use('/auth', authRouter.router);
 server.use('/cart', isAuth(), cartRouter.router);
 server.use('/orders', isAuth(), ordersRouter.router);
 
-// this line we add to make react router work in case of other routes doesnt match
 server.get('*', (req, res) =>
   res.sendFile(path.resolve('build', 'index.html'))
 );
 
-// Passport Strategies
 passport.use(
   'local',
   new LocalStrategy({ usernameField: 'email' }, async function (
@@ -114,13 +108,11 @@ passport.use(
     password,
     done
   ) {
-    // by default passport uses username
    
     try {
       const user = await User.findOne({ email: email });
-      console.log(email, password, user);
       if (!user) {
-        return done(null, false, { message: 'invalid credentials' }); // for safety
+        return done(null, false, { message: 'invalid credentials' });
       }
       crypto.pbkdf2(
         password,
@@ -136,7 +128,7 @@ passport.use(
             sanitizeUser(user),
             process.env.JWT_SECRET_KEY
           );
-          done(null, { id: user.id, role: user.role, token }); // this lines sends to serializer
+          done(null, { id: user.id, role: user.role, token }); 
         }
       );
     } catch (err) {
@@ -151,7 +143,7 @@ passport.use(
     try {
       const user = await User.findById(jwt_payload.id);
       if (user) {
-        return done(null, sanitizeUser(user)); // this calls serializer
+        return done(null, sanitizeUser(user)); 
       } else {
         return done(null, false);
       }
@@ -161,14 +153,12 @@ passport.use(
   })
 );
 
-// this creates session variable req.user on being called from callbacks
 passport.serializeUser(function (user, cb) {
   process.nextTick(function () {
     return cb(null, { id: user.id, role: user.role });
   });
 });
 
-// this changes session variable req.user when called from authorized request
 
 passport.deserializeUser(function (user, cb) {
   process.nextTick(function () {
@@ -178,15 +168,13 @@ passport.deserializeUser(function (user, cb) {
 
 // Payments
 
-// This is your test secret API key.
 const stripe = require('stripe')(process.env.STRIPE_SERVER_KEY);
 
 server.post('/create-payment-intent', async (req, res) => {
   const { totalAmount, orderId } = req.body;
 
-  // Create a PaymentIntent with the order amount and currency
   const paymentIntent = await stripe.paymentIntents.create({
-    amount: totalAmount * 100, // for decimal compensation
+    amount: totalAmount * 100, 
     currency: 'inr',
     automatic_payment_methods: {
       enabled: true,
@@ -205,9 +193,9 @@ main().catch((err) => console.log(err));
 
 async function main() {
   await mongoose.connect(process.env.MONGODB_URL);
-  console.log('database connected');
+ // console.log('database connected');
 }
 
 server.listen(process.env.PORT, () => {
-  console.log('server started');
+ // console.log('server started');
 });
