@@ -58,3 +58,9 @@ npm run server
 cd ../frontend
 npm install
 npm start
+```
+
+
+Author
+Abdul Sami
+GitHub: @AbdulSamiWorks
