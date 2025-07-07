@@ -1,5 +1,3 @@
-MERN Ecommerce by sami
-
 # 🛍️ Cosmetics Ecommerce Platform – MERN Stack 💄
 
 A full-featured Ecommerce web application for a cosmetics store built using the **MERN stack** (MongoDB, Express.js, React, Node.js) with **Redux** for state management. It includes user authentication, product management, cart functionality, admin dashboard, and a responsive UI.
